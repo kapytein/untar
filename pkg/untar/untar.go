@@ -130,6 +130,10 @@ func untar(r io.Reader, dir string) (err error) {
 			madeDir[abs] = true
 		case tar.TypeXGlobalHeader:
 			// git archive generates these. Ignore them.
+		case tar.TypeSymlink:
+			if !validRelPath(f.Linkname) {
+				return fmt.Errorf("tar file entry %s contained invalid symlink %q", f.Name, f.Linkname)
+			}
 
 		default:
 			return fmt.Errorf("tar file entry %s contained unsupported file type %v", f.Name, mode)
